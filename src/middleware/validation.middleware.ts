@@ -70,7 +70,7 @@ export const validateBook = (req: Request, res: Response, next: NextFunction) =>
   }, {} as Record<string, string[]>);
   
   if (Object.keys(filteredErrors).length > 0) {
-    throw new ValidationError(filteredErrors);
+    throw new ValidationError('Validation failed', filteredErrors);
   }
   
   next();

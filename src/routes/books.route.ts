@@ -29,18 +29,19 @@ router.get('/', (req: Request, res: Response) => {
 });
 
 // GET BOOK BY ID
-router.get('/:id', validateBookId, (req: Request, res: Response) => {
+router.get('/:id', validateBookId, (req: Request, res: Response): void => {
   const book = books.find(b => b.id === req.params.id);
   if (!book) {
-    return res.status(404).json({ message: 'Book not found' });
+    res.status(404).json({ message: 'Book not found' });
+    return;
   }
-  
+
   const author = authors.find(a => a.id === book.authorId);
   const bookWithAuthor = {
     ...book,
     author: author ? { id: author.id, name: author.name } : null
   };
-  
+
   res.status(200).json(bookWithAuthor);
 });
 
@@ -70,17 +71,18 @@ router.post('/', validateBook, (req: Request, res: Response) => {
 });
 
 // PUT  BOOK BY ID
-router.put('/:id', [validateBookId, validateBook], (req: Request, res: Response) => {
+router.put('/:id', [validateBookId, validateBook], (req: Request, res: Response): void => {
   const { id } = req.params;
   const { title, authorId, isbn, publishedYear, genre, description } = req.body;
-  
+
   const bookIndex = books.findIndex(b => b.id === id);
   if (bookIndex === -1) {
-    return res.status(404).json({ message: 'Book not found' });
+    res.status(404).json({ message: 'Book not found' });
+    return;
   }
-  
+
   const oldBook = books[bookIndex];
-  
+
   // If author is being changed, update the authors' books arrays
   if (authorId && authorId !== oldBook.authorId) {
     // Remove book from old author's books array
@@ -88,14 +90,14 @@ router.put('/:id', [validateBookId, validateBook], (req: Request, res: Response)
     if (oldAuthorIndex !== -1) {
       authors[oldAuthorIndex].books = authors[oldAuthorIndex].books.filter(bookId => bookId !== id);
     }
-    
+
     // Add book to new author's books array
     const newAuthorIndex = authors.findIndex(a => a.id === authorId);
     if (newAuthorIndex !== -1) {
       authors[newAuthorIndex].books.push(id);
     }
   }
-  
+
   const updatedBook: Book = {
     ...oldBook,
     title: title || oldBook.title,
@@ -105,32 +107,33 @@ router.put('/:id', [validateBookId, validateBook], (req: Request, res: Response)
     ...(genre !== undefined ? { genre } : { genre: oldBook.genre }),
     ...(description !== undefined ? { description } : { description: oldBook.description })
   };
-  
+
   books[bookIndex] = updatedBook;
-  
+
   res.status(200).json(updatedBook);
 });
 
 // DELETE /books/:id - Delete a book
-router.delete('/:id', validateBookId, (req: Request, res: Response) => {
+router.delete('/:id', validateBookId, (req: Request, res: Response): void => {
   const { id } = req.params;
   const bookIndex = books.findIndex(b => b.id === id);
-  
+
   if (bookIndex === -1) {
-    return res.status(404).json({ message: 'Book not found' });
+    res.status(404).json({ message: 'Book not found' });
+    return;
   }
-  
+
   const book = books[bookIndex];
-  
+
   // Remove book from author's books array
   const authorIndex = authors.findIndex(a => a.id === book.authorId);
   if (authorIndex !== -1) {
     authors[authorIndex].books = authors[authorIndex].books.filter(bookId => bookId !== id);
   }
-  
+
   // Remove the book
   books = books.filter(b => b.id !== id);
-  
+
   res.status(204).send();
 });
 
