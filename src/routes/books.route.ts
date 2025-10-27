@@ -14,7 +14,7 @@ let authors: Author[] = [];
 // Generate a simple ID
 const generateId = (): string => Math.random().toString(36).substr(2, 9);
 
-// GET /books - Get all books
+// GET 
 router.get('/', (req: Request, res: Response) => {
   // Include author details in the response
   const booksWithAuthors = books.map(book => {
@@ -28,7 +28,7 @@ router.get('/', (req: Request, res: Response) => {
   res.status(200).json(booksWithAuthors);
 });
 
-// GET /books/:id - Get book by ID
+// GET BOOK BY ID
 router.get('/:id', validateBookId, (req: Request, res: Response) => {
   const book = books.find(b => b.id === req.params.id);
   if (!book) {
@@ -44,7 +44,7 @@ router.get('/:id', validateBookId, (req: Request, res: Response) => {
   res.status(200).json(bookWithAuthor);
 });
 
-// POST /books - Create a new book
+// POST 
 router.post('/', validateBook, (req: Request, res: Response) => {
   const { title, authorId, isbn, publishedYear, genre, description } = req.body;
   
@@ -69,7 +69,7 @@ router.post('/', validateBook, (req: Request, res: Response) => {
   res.status(201).json(newBook);
 });
 
-// PUT /books/:id - Update a book
+// PUT  BOOK BY ID
 router.put('/:id', [validateBookId, validateBook], (req: Request, res: Response) => {
   const { id } = req.params;
   const { title, authorId, isbn, publishedYear, genre, description } = req.body;
